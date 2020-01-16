@@ -1,0 +1,31 @@
+name: dante-telegram
+
+on:
+  push:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # At 00:00 on Sunday.
+    # https://crontab.guru/#0_0_*_*_7
+    - cron:  '30 3 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: setup-docker
+      uses: docker-practice/actions-setup-docker@0.0.1
+    - name: Install dependencies
+      run: |
+        curl -sL https://github.com/ojab/docker-dante-telegram/archive/master.tar.gz | tar xz
+    - name: Publish to Registry
+      uses: elgohr/Publish-Docker-Github-Action@master
+      with:
+        name: unchartedsky/dockers/dante-telegram
+        registry: docker.pkg.github.com
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        context: docker-dante-telegram-master
+        buildoptions: "--compress --force-rm"
+        cache: ${{ github.event_name != 'schedule' }}
+        tag_names: true
