@@ -1,4 +1,4 @@
-![](https://github.com/unchartedsky/dockers/workflows/RequestBin/badge.svg)
+![](https://github.com/unchartedsky/dockers/workflows/dante-telegram/badge.svg)
 
 # dante-telegram
 
