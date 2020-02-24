@@ -7,11 +7,13 @@ RUN pecl install apcu \
     && docker-php-ext-enable apc --ini-name 20-docker-php-ext-apc.ini
 
 RUN apt-get update \
-    && apt-get install -y libtidy-dev libicu-dev \
+    && apt-get install -y libtidy-dev libicu-dev libzip-dev \
     && docker-php-ext-install tidy \
     && docker-php-ext-enable tidy \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install intl
+    && docker-php-ext-install intl \
+    && docker-php-ext-configure zip \
+    && docker-php-ext-install zip
 
 # Clean repository
 RUN apt-get clean \
