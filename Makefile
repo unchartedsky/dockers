@@ -1,5 +1,6 @@
 SHELL := /bin/bash
 
+TEMPLATE_IMAGES = $(shell find * -type f -name 'Dockerfile.template' -not -path "." | xargs dirname)
 IMAGES = $(shell find * -type f -name 'Dockerfile' -not -path "." | xargs dirname)
 GIT_COMMIT_ID=$(shell git rev-parse --short HEAD)
 export GIT_COMMIT_ID
@@ -8,7 +9,12 @@ export GIT_BRANCH
 
 REPO=docker.pkg.github.com/unchartedsky/dockers
 
-image:
+template:
+	@ for TEMPLATE_IMAGE in $(TEMPLATE_IMAGES) ; do \
+		cat $(TEMPLATE_IMAGES)/Dockerfile.template | docker run -i --rm subfuzion/envtpl > $(TEMPLATE_IMAGES)/Dockerfile ; \
+	done
+
+image: template
 	@ for IMAGE in $(IMAGES) ; do \
 		echo Building $(REPO)/$${IMAGE}:$(GIT_COMMIT_ID) ; \
 		docker build -t $(REPO)/$${IMAGE}:$(GIT_COMMIT_ID) $${IMAGE} ; \

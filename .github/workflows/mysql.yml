@@ -1,0 +1,35 @@
+name: mysql
+
+on:
+  push:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # At 00:00 on Sunday.
+    # https://crontab.guru/#0_0_*_*_7
+    - cron:  '30 3 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mysql-version: [ "5.7.18" ]
+        percona-extrabackup-pkg-name: [ "percona-xtrabackup-24" ]
+    steps:
+    - uses: actions/checkout@master
+    - uses: azure/docker-login@v1
+      with:
+        login-server: docker.pkg.github.com
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build
+      run: |
+        cat ${PROJECT}/Dockerfile.template | docker run -i --rm subfuzion/envtpl > ${PROJECT}/Dockerfile ;
+        docker build -f ${PROJECT}/Dockerfile -t ${CONTAINER_IMAGE} .
+      env:
+        PROJECT: ${{ github.workflow }}
+        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ matrix.mysql-version }}-with-${{ matrix.percona-extrabackup-pkg-name }}-${{ github.sha }}
+    - name: Deploy
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker push ${CONTAINER_IMAGE}

@@ -1,4 +1,4 @@
-name: Dockerize
+name: fulltextrss-base
 
 on:
   push:
@@ -18,7 +18,13 @@ jobs:
         login-server: docker.pkg.github.com
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Publish to Registry
+    - name: Build
       run: |
-        make image
-        make deploy
+        docker build -f ${PROJECT}/Dockerfile -t ${CONTAINER_IMAGE} .
+      env:
+        PROJECT: ${{ github.workflow }}
+        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
+    - name: Deploy
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker push ${CONTAINER_IMAGE}
