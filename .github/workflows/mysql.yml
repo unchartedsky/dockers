@@ -16,12 +16,18 @@ jobs:
         mysql-version: [ "5.7.18" ]
         percona-extrabackup-pkg-name: [ "percona-xtrabackup-24" ]
     steps:
+    - name: Env
+      run: |
+        env | sort
     - uses: actions/checkout@master
     - uses: azure/docker-login@v1
       with:
         login-server: docker.pkg.github.com
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Handle keyserver connections
+      run: |
+        wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
     - name: Build
       run: |
         cat ${PROJECT}/Dockerfile.template | docker run -i --rm subfuzion/envtpl > ${PROJECT}/Dockerfile ;
