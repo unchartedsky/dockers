@@ -33,3 +33,5 @@ jobs:
       if: github.ref == 'refs/heads/master'
       run: |
         docker push ${CONTAINER_IMAGE}
+      env:
+        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ matrix.mysql-version }}-with-${{ matrix.percona-extrabackup-pkg-name }}-${{ github.sha }}
