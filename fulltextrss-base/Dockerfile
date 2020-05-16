@@ -4,7 +4,18 @@ FROM php:7.2-apache-buster
 RUN pecl install apcu \
     && pecl install apcu_bc-1.0.5 \
     && docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini \
-    && docker-php-ext-enable apc --ini-name 20-docker-php-ext-apc.ini
+    && docker-php-ext-enable apc --ini-name 20-docker-php-ext-apc.ini \
+    && pecl clear-cache
+
+# imagick and gd is for pdf-newspaper only
+RUN apt-get update \
+    && apt-get install -y libmagickwand-dev --no-install-recommends \
+    && echo "" | pecl install imagick \
+    && docker-php-ext-enable imagick
+
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd \
+    && pecl clear-cache
 
 RUN apt-get update \
     && apt-get install -y libtidy-dev libicu-dev libzip-dev \
