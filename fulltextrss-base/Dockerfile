@@ -1,24 +1,24 @@
-FROM php:7.2-apache-buster
+FROM php:7.4-apache-buster
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Install APCu and APC backward compatibility
 RUN pecl install apcu \
-    && pecl install apcu_bc-1.0.5 \
+    && pecl install apcu_bc \
     && docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini \
-    && docker-php-ext-enable apc --ini-name 20-docker-php-ext-apc.ini \
-    && pecl clear-cache
+    && docker-php-ext-enable apc --ini-name 20-docker-php-ext-apc.ini
 
 # imagick and gd is for pdf-newspaper only
-RUN apt-get update \
-    && apt-get install -y libmagickwand-dev --no-install-recommends \
+RUN apt-get update -q -y \
+    && apt-get install -q -y libmagickwand-dev --no-install-recommends \
     && echo "" | pecl install imagick \
     && docker-php-ext-enable imagick
 
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd \
-    && pecl clear-cache
+RUN docker-php-ext-configure gd \
+    && docker-php-ext-install gd
 
-RUN apt-get update \
-    && apt-get install -y libtidy-dev libicu-dev libzip-dev \
+RUN apt-get update -q -y \
+    && apt-get install -q -y libtidy-dev libicu-dev libzip-dev \
     && docker-php-ext-install tidy \
     && docker-php-ext-enable tidy \
     && docker-php-ext-configure intl \
@@ -28,4 +28,5 @@ RUN apt-get update \
 
 # Clean repository
 RUN apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && pecl clear-cache
