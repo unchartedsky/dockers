@@ -16,6 +16,8 @@ jobs:
       run: |
         env | sort
     - uses: actions/checkout@master
+    - name: setup Docker
+      uses: docker-practice/actions-setup-docker@0.0.1
     - uses: azure/docker-login@v1
       with:
         login-server: docker.pkg.github.com

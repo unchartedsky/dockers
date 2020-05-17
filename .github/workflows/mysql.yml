@@ -13,18 +13,33 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        mysql-version: [ "5.7.18" ]
-        percona-extrabackup-pkg-name: [ "percona-xtrabackup-24" ]
+        docker_version:
+        - 19.09
+        docker_channel:
+        - stable
+        mysql-version:
+        - "5.7.18"
+        percona-extrabackup-pkg-name:
+        - "percona-xtrabackup-24"
     steps:
     - name: Env
       run: |
         env | sort
     - uses: actions/checkout@master
+    - name: setup-docker
+      uses: docker-practice/actions-setup-docker@0.0.1
+      with:
+        docker_version: ${{ matrix.docker_version }}
+        docker_channel: ${{ matrix.docker_channel }}
     - uses: azure/docker-login@v1
       with:
         login-server: docker.pkg.github.com
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: get shortsha
+      id: vars
+      run: |
+        echo ::set-output name=sha_short::$(git rev-parse --short=8 ${{ github.sha }})
     - name: Handle keyserver connections
       run: |
         wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
@@ -34,10 +49,10 @@ jobs:
         docker build -f ${PROJECT}/Dockerfile -t ${CONTAINER_IMAGE} .
       env:
         PROJECT: ${{ github.workflow }}
-        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ matrix.mysql-version }}-with-${{ matrix.percona-extrabackup-pkg-name }}-${{ github.sha }}
+        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ steps.vars.outputs.sha_short }}
     - name: Deploy
       if: github.ref == 'refs/heads/master'
       run: |
         docker push ${CONTAINER_IMAGE}
       env:
-        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ matrix.mysql-version }}-with-${{ matrix.percona-extrabackup-pkg-name }}-${{ github.sha }}
+        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ steps.vars.outputs.sha_short }}
