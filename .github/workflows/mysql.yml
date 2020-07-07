@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         mysql-version:
-          - "5.7.18"
+          - "5.7.30"
         percona-extrabackup-pkg-name:
           - "percona-xtrabackup-24"
     steps:
@@ -26,7 +26,7 @@ jobs:
           env | sort
       - uses: actions/checkout@master
       - name: setup-docker
-        uses: docker-practice/actions-setup-docker@0.0.1
+        uses: docker-practice/actions-setup-docker@master
       - name: Handle keyserver connections
         run: |
           wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash

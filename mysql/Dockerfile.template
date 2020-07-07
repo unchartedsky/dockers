@@ -1,4 +1,4 @@
-FROM mysql:{{ .Env.MYSQL_VERSION | default "5.7.18" }}
+FROM mysql:{{ .Env.MYSQL_VERSION | default "5.7.30" }}
 
 WORKDIR /tmp
 
