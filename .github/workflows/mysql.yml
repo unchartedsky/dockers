@@ -2,57 +2,48 @@ name: mysql
 
 on:
   push:
+    paths:
+      - ".github/workflows/mysql.yml"
+      - "mysql/**"
   schedule:
     # * is a special character in YAML so you have to quote this string
     # At 00:00 on Sunday.
     # https://crontab.guru/#0_0_*_*_7
-    - cron:  '30 3 * * *'
+    - cron: "30 3 * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        docker_version:
-        - 19.09
-        docker_channel:
-        - stable
         mysql-version:
-        - "5.7.18"
+          - "5.7.18"
         percona-extrabackup-pkg-name:
-        - "percona-xtrabackup-24"
+          - "percona-xtrabackup-24"
     steps:
-    - name: Env
-      run: |
-        env | sort
-    - uses: actions/checkout@master
-    - name: setup-docker
-      uses: docker-practice/actions-setup-docker@0.0.1
-      with:
-        docker_version: ${{ matrix.docker_version }}
-        docker_channel: ${{ matrix.docker_channel }}
-    - uses: azure/docker-login@v1
-      with:
-        login-server: docker.pkg.github.com
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: get shortsha
-      id: vars
-      run: |
-        echo ::set-output name=sha_short::$(git rev-parse --short=8 ${{ github.sha }})
-    - name: Handle keyserver connections
-      run: |
-        wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
-    - name: Build
-      run: |
-        cat ${PROJECT}/Dockerfile.template | docker run -i --rm subfuzion/envtpl > ${PROJECT}/Dockerfile ;
-        docker build -f ${PROJECT}/Dockerfile -t ${CONTAINER_IMAGE} .
-      env:
-        PROJECT: ${{ github.workflow }}
-        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ steps.vars.outputs.sha_short }}
-    - name: Deploy
-      if: github.ref == 'refs/heads/master'
-      run: |
-        docker push ${CONTAINER_IMAGE}
-      env:
-        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ steps.vars.outputs.sha_short }}
+      - name: Env
+        run: |
+          env | sort
+      - uses: actions/checkout@master
+      - name: setup-docker
+        uses: docker-practice/actions-setup-docker@0.0.1
+      - name: Handle keyserver connections
+        run: |
+          wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
+      - name: Generate Dockerfile
+        run: |
+          cat ${PROJECT}/Dockerfile.template | docker run -i --rm subfuzion/envtpl > ${PROJECT}/Dockerfile ;
+        env:
+          PROJECT: ${{ github.workflow }}
+      - name: Publish to Registry
+        uses: docker/build-push-action@v1
+        with:
+          registry: docker.pkg.github.com
+          repository: ${{ github.repository }}/${{ github.workflow }}
+          dockerfile: ${{ github.workflow }}/Dockerfile
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          tags: "latest"
+          tag_with_ref: true
+          tag_with_sha: true
+          add_git_labels: true
