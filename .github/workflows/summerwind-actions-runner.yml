@@ -1,0 +1,47 @@
+name: summerwind-actions-runner
+
+on:
+  push:
+    paths:
+      - ".github/workflows/summerwind-actions-runner.yml"
+      - "summerwind-actions-runner/**"
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # At 00:00 on Sunday.
+    # https://crontab.guru/#0_0_*_*_7
+    - cron: "30 3 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        summerwind-actions-runner-version:
+          - "latest"
+    steps:
+      - name: Env
+        run: |
+          env | sort
+      - uses: actions/checkout@master
+      - name: setup-docker
+        uses: docker-practice/actions-setup-docker@master
+      - name: Handle keyserver connections
+        run: |
+          wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
+      - name: Generate Dockerfile
+        run: |
+          cat ${PROJECT}/Dockerfile.template | docker run -i --rm subfuzion/envtpl > ${PROJECT}/Dockerfile ;
+        env:
+          PROJECT: ${{ github.workflow }}
+      - name: Publish to Registry
+        uses: docker/build-push-action@v1
+        with:
+          registry: docker.pkg.github.com
+          repository: ${{ github.repository }}/${{ github.workflow }}
+          dockerfile: ${{ github.workflow }}/Dockerfile
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          tags: "latest"
+          tag_with_ref: true
+          tag_with_sha: true
+          add_git_labels: true

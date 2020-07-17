@@ -1,0 +1,21 @@
+FROM summerwind/actions-runner:{{ .Env.MYSQL_VERSION | default "latest" }}
+
+USER root
+WORKDIR /tmp
+
+RUN set -ex; \
+    export DEBIAN_FRONTEND=noninteractive; \
+    runDeps='git git-lfs'; \
+    buildDeps=''; \
+    apt-get update -y && apt-get install -y $runDeps $buildDeps --no-install-recommends; \
+    rm -rf /var/lib/apt/lists/*; \
+    apt-get purge -y --auto-remove $buildDeps; \
+    rm /var/log/dpkg.log /var/log/apt/*.log;
+
+RUN curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm awscliv2.zip
+
+WORKDIR /
+USER runner
