@@ -23,9 +23,9 @@ jobs:
       uses: docker-practice/actions-setup-docker@0.0.1
     - uses: azure/docker-login@v1
       with:
-        login-server: docker.pkg.github.com
+        login-server: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ secrets.PAT_ANDROMEDARABBIT }}
     - name: Handle keyserver connections
       run: |
         wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
@@ -34,10 +34,10 @@ jobs:
         docker build -f ${PROJECT}/Dockerfile -t ${CONTAINER_IMAGE} .
       env:
         PROJECT: ${{ github.workflow }}
-        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
+        CONTAINER_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}:${{ github.sha }}
     - name: Deploy
       if: github.ref == 'refs/heads/master'
       run: |
         docker push ${CONTAINER_IMAGE}
       env:
-        CONTAINER_IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.workflow }}:${{ github.sha }}
+        CONTAINER_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}:${{ github.sha }}

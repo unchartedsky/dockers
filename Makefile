@@ -7,7 +7,7 @@ export GIT_COMMIT_ID
 GIT_BRANCH=$(shell git describe --abbrev=1 --tags --always)
 export GIT_BRANCH
 
-REPO=docker.pkg.github.com/unchartedsky/dockers
+REPO=ghcr.io/unchartedsky
 
 template:
 	@ for TEMPLATE_IMAGE in $(TEMPLATE_IMAGES) ; do \

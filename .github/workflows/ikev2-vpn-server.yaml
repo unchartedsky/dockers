@@ -24,10 +24,10 @@ jobs:
     - name: Publish to Registry
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
-        name: unchartedsky/dockers/docker-ikev2-vpn-server
-        registry: docker.pkg.github.com
+        name: unchartedsky/ikev2-vpn-server
+        registry: ghcr.io
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ secrets.PAT_ANDROMEDARABBIT }}
         context: docker-ikev2-vpn-server-master
         buildoptions: "--compress --force-rm"
         cache: ${{ github.event_name != 'schedule' }}

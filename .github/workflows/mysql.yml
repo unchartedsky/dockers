@@ -38,11 +38,11 @@ jobs:
       - name: Publish to Registry
         uses: docker/build-push-action@v1
         with:
-          registry: docker.pkg.github.com
-          repository: ${{ github.repository }}/${{ github.workflow }}
+          registry: ghcr.io
+          repository: ${{ github.repository_owner}}/${{ github.workflow }}
           dockerfile: ${{ github.workflow }}/Dockerfile
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.PAT_ANDROMEDARABBIT }}
           tags: "latest"
           tag_with_ref: true
           tag_with_sha: true

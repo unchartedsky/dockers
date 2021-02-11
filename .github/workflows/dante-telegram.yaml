@@ -25,10 +25,10 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: ${{ github.repository }}/${{ github.workflow }}
-          registry: docker.pkg.github.com
+          name: ${{ github.repository_owner }}/${{ github.workflow }}
+          registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.PAT_ANDROMEDARABBIT }}
           workdir: docker-dante-telegram-master
           buildargs: all_networks='true'
           buildoptions: "--compress --force-rm"
