@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
-TEMPLATE_IMAGES = $(shell find * -type f -name 'Dockerfile.template' -not -path "." | xargs dirname)
-IMAGES = $(shell find * -type f -name 'Dockerfile' -not -path "." | xargs dirname)
+TEMPLATE_IMAGES = $(shell find * -type f -name 'Dockerfile.template' -not -path "." | xargs -I {} dirname {})
+IMAGES = $(shell find * -type f -name 'Dockerfile' -not -path "." | xargs -I {} dirname {})
 GIT_COMMIT_ID=$(shell git rev-parse --short HEAD)
 export GIT_COMMIT_ID
 GIT_BRANCH=$(shell git describe --abbrev=1 --tags --always)
@@ -9,9 +9,9 @@ export GIT_BRANCH
 
 REPO=ghcr.io/unchartedsky
 
-template:
-	@ for TEMPLATE_IMAGE in $(TEMPLATE_IMAGES) ; do \
-		cat $(TEMPLATE_IMAGES)/Dockerfile.template | docker run -i --rm subfuzion/envtpl > $(TEMPLATE_IMAGES)/Dockerfile ; \
+template: $(TEMPLATE_IMAGES)
+	for TEMPLATE_IMAGE in $(TEMPLATE_IMAGES) ; do \
+		cat $${TEMPLATE_IMAGE}/Dockerfile.template | docker run -i --rm subfuzion/envtpl > $${TEMPLATE_IMAGE}/Dockerfile ; \
 	done
 
 image: template
