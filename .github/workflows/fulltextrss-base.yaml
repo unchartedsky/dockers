@@ -3,7 +3,7 @@ name: fulltextrss-base
 on:
   push:
     paths:
-      - ".github/workflows/fulltextrss-base.yml"
+      - ".github/workflows/fulltextrss-base.yaml"
       - "fulltextrss-base/**"
   schedule:
     # * is a special character in YAML so you have to quote this string

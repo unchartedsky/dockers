@@ -3,7 +3,7 @@ name: dante-telegram
 on:
   push:
     paths:
-      - ".github/workflows/dante-telegram.yml"
+      - ".github/workflows/dante-telegram.yaml"
       - "dante-telegram/**"
   schedule:
     # * is a special character in YAML so you have to quote this string
