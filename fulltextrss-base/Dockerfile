@@ -1,4 +1,4 @@
-FROM php:8-apache-buster
+FROM php:7.4-apache-buster
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
