@@ -16,8 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: setup-docker
-      uses: docker-practice/actions-setup-docker@0.0.1
+    -
+      name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v1
     - name: Install dependencies
       run: |
         curl -sL https://github.com/gaomd/docker-ikev2-vpn-server/archive/master.tar.gz | tar xz
