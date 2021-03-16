@@ -3,7 +3,7 @@ name: ikev2-vpn-server
 on:
   push:
     paths:
-      - ".github/workflows/ikev2-vpn-server.yml"
+      - ".github/workflows/ikev2-vpn-server.yaml"
       - "ikev2-vpn-server/**"
   schedule:
     # * is a special character in YAML so you have to quote this string

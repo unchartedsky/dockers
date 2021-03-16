@@ -1,10 +1,10 @@
-name: mysql
+name: summerwind-actions-runner
 
 on:
   push:
     paths:
-      - ".github/workflows/mysql.yml"
-      - "mysql/**"
+      - ".github/workflows/summerwind-actions-runner.yaml"
+      - "summerwind-actions-runner/**"
   schedule:
     # * is a special character in YAML so you have to quote this string
     # At 00:00 on Sunday.
@@ -16,10 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        mysql-version:
-          - "5.7.30"
-        percona-extrabackup-pkg-name:
-          - "percona-xtrabackup-24"
+        summerwind-actions-runner-version:
+          - "latest"
     steps:
       - name: Env
         run: |
@@ -41,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           registry: ghcr.io
-          repository: ${{ github.repository_owner}}/${{ github.workflow }}
+          repository: ${{ github.repository_owner }}/${{ github.workflow }}
           dockerfile: ${{ github.workflow }}/Dockerfile
           username: ${{ github.actor }}
           password: ${{ secrets.PAT_ANDROMEDARABBIT }}
