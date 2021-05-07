@@ -26,8 +26,8 @@ jobs:
     - uses: azure/docker-login@v1
       with:
         login-server: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.PAT_ANDROMEDARABBIT }}
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     - name: Handle keyserver connections
       run: |
         wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash

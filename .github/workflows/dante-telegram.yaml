@@ -29,8 +29,8 @@ jobs:
         with:
           name: ${{ github.repository_owner }}/${{ github.workflow }}
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.PAT_ANDROMEDARABBIT }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           workdir: docker-dante-telegram-master
           buildargs: all_networks='true'
           buildoptions: "--compress --force-rm"

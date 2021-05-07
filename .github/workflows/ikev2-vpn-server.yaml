@@ -28,8 +28,8 @@ jobs:
       with:
         name: unchartedsky/ikev2-vpn-server
         registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.PAT_ANDROMEDARABBIT }}
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
         context: docker-ikev2-vpn-server-master
         buildoptions: "--compress --force-rm"
         cache: ${{ github.event_name != 'schedule' }}

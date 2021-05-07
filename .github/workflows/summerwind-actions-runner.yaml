@@ -41,8 +41,8 @@ jobs:
           registry: ghcr.io
           repository: ${{ github.repository_owner }}/${{ github.workflow }}
           dockerfile: ${{ github.workflow }}/Dockerfile
-          username: ${{ github.actor }}
-          password: ${{ secrets.PAT_ANDROMEDARABBIT }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           tags: "latest"
           tag_with_ref: true
           tag_with_sha: true
