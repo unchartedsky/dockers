@@ -1,25 +1,32 @@
-name: mysql
+name: wordpress
 
 on:
   push:
     paths:
-      - ".github/workflows/mysql.yaml"
-      - "mysql/**"
+      - ".github/workflows/wordpress.yml"
+      - "wordpress/**"
   schedule:
     # * is a special character in YAML so you have to quote this string
-    # At 00:00 on Sunday.
-    # https://crontab.guru/#0_0_*_*_7
-    - cron: "30 3 * * *"
+    # At 17:00
+    # KST 기준: 2시
+    # https://crontab.guru/#0_17_*_*_*
+    - cron: "0 17 * * *"
+
+defaults:
+  run:
+    # shell: bash
+    # shell: bash --init-file /home/runner/.pyenvrc -leo pipefail {0}
+    shell: bash -leo pipefail {0}
 
 jobs:
   build:
+    # contains function is not case sensitive
+    if: |
+      !contains(github.event.commits[0].message, '[skip ci]')
+      && !startswith(github.event.commits[0].message, 'skip ci ')
+      && !contains(github.event.commits[0].message, '[wip]')
+      && !startswith(github.event.commits[0].message, 'wip ')
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        mysql-version:
-          - "5.7.30"
-        percona-extrabackup-pkg-name:
-          - "percona-xtrabackup-24"
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}
     steps:
@@ -83,11 +90,9 @@ jobs:
           set -x
 
           cd "${THIS_DIR}"
-          cat Dockerfile.template | docker run -i --rm subfuzion/envtpl > Dockerfile ;
+          ./prepare.sh
 
-          # NOTE 나중에 개선하자
-          # IMAGE_VERSION=$(cat "tmp/base_image_version.txt")
-          IMAGE_VERSION="5.7.30"
+          IMAGE_VERSION=$(cat "tmp/base_image_version.txt")
           TAGS="$TAGS,$DOCKER_IMAGE:$IMAGE_VERSION"
           echo ::set-output name=tags::${TAGS}
         env:
