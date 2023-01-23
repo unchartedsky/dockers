@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         mysql-version:
-          - "5.7.30"
+          - "5.7.41-debian"
         percona-extrabackup-pkg-name:
           - "percona-xtrabackup-24"
     env:
@@ -87,7 +87,7 @@ jobs:
 
           # NOTE 나중에 개선하자
           # IMAGE_VERSION=$(cat "tmp/base_image_version.txt")
-          IMAGE_VERSION="5.7.30"
+          IMAGE_VERSION="5.7.41-debian"
           TAGS="$TAGS,$DOCKER_IMAGE:$IMAGE_VERSION"
           echo ::set-output name=tags::${TAGS}
         env:
