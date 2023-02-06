@@ -36,7 +36,7 @@ jobs:
         env:
           PROJECT: ${{ github.workflow }}
       - name: Publish to Registry
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v4
         with:
           registry: ghcr.io
           repository: ${{ github.repository_owner }}/${{ github.workflow }}
