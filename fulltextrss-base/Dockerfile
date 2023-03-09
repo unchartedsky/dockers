@@ -1,12 +1,10 @@
-FROM php:7.4-apache-bullseye
+FROM php:8.1-apache-bullseye
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 # Install APCu and APC backward compatibility
 RUN pecl install apcu \
-    && pecl install apcu_bc \
-    && docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini \
-    && docker-php-ext-enable apc --ini-name 20-docker-php-ext-apc.ini
+    && docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini
 
 # imagick and gd is for pdf-newspaper only
 RUN apt-get update -q -y \
