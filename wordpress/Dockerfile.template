@@ -21,9 +21,9 @@ RUN apt-get update && \
       libmagickwand-6.q16-6 libopenjp2-7 libtiff5 libx11-6 libx11-data libxau6 \
       libxcb1 libxdmcp6 libxext6 unzip \
       gcc make autoconf libc-dev pkg-config libmagickwand-dev && \
-    echo "" | pecl install redis imagick && \
+    echo "" | pecl install redis && \
     echo "" >> /opt/bitnami/php/etc/php.ini && \
-    echo -e "extension=imagick\n" > /opt/bitnami/php/etc/conf.d/imagemagick.ini  && \
+    # echo -e "extension=imagick\n" > /opt/bitnami/php/etc/conf.d/imagemagick.ini  && \
     echo -e "extension=redis.so\n" > /opt/bitnami/php/etc/conf.d/redis.ini  && \
     echo "[www]\nenv[MAGICK_CODER_MODULE_PATH]='$(find /usr/lib/x86_64-linux-gnu -maxdepth 1 -type d -name ImageMagick-*)/modules-Q16/coders'" > /opt/bitnami/php/etc/php-fpm.d/imagemagick.conf && \
     apt-get -y remove --auto-remove \
