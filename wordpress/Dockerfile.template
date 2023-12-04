@@ -6,7 +6,7 @@ USER root
 
 RUN set -ex; \
     export DEBIAN_FRONTEND=noninteractive; \
-    deps='curl ca-certificates wget unzip jq vim cron html2text awscli rsync'; \
+    deps='curl ca-certificates wget unzip jq rsync vim cron html2text awscli'; \
     apt-get update -y; \
     apt-get install -y $deps; \
     rm /var/log/dpkg.log /var/log/apt/*.log;
