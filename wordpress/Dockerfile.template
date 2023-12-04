@@ -37,7 +37,7 @@ ENV NR_INSTALL_SILENT true
 
 WORKDIR /tmp
 
-RUN useradd -r -u 1001 -g group app
+RUN useradd -r -u 1001 -g root app
 
 RUN export NEWRELIC_FILENAME=$(curl -L --silent https://download.newrelic.com/php_agent/release | html2text | grep linux.tar.gz | cut -d ' ' -f1) && \
         curl --silent -L "https://download.newrelic.com/php_agent/release/${NEWRELIC_FILENAME}" -o "${NEWRELIC_FILENAME}" && \
