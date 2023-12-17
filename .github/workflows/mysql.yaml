@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         mysql-version:
-          - "5.7.41-debian"
+          - "5.7-debian-11"
         percona-extrabackup-pkg-name:
           - "percona-xtrabackup-24"
     env:
