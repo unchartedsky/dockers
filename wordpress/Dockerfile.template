@@ -1,6 +1,6 @@
 FROM docker.io/bitnami/wordpress:{{.BASE_IMAGE_VERSION | default "latest"}}
 
-LABEL org.opencontainers.image.source = "https://github.com/unchartedsky/dockers"
+LABEL org.opencontainers.image.source="https://github.com/unchartedsky/dockers"
 
 USER root
 
