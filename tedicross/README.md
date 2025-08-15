@@ -72,15 +72,32 @@ docker run -d --name tedicross \
   tedicross-custom:0.12.4-network-fix
 ```
 
-### 4. Docker Compose
+### 4. SOCKS5 프록시 사용
+
+SOCKS5 프록시를 통해 연결하려면 환경 변수를 설정하세요:
+
+```bash
+# SOCKS5 프록시 사용
+docker run -d --name tedicross \
+  -e SOCKS5_PROXY_HOST=your-proxy-host \
+  -e SOCKS5_PROXY_PORT=1080 \
+  -v $(pwd)/data:/opt/TediCross/data \
+  tedicross-custom:0.12.4-node22
+```
+
+### 5. Docker Compose
 
 ```yaml
 version: '3.8'
 
 services:
   tedicross:
-    image: tedicross-custom:0.12.4-network-fix
+    image: tedicross-custom:0.12.4-node22
     container_name: tedicross
+    environment:
+      # SOCKS5 프록시 설정 (선택사항)
+      - SOCKS5_PROXY_HOST=your-proxy-host
+      - SOCKS5_PROXY_PORT=1080
     volumes:
       - ./data:/opt/TediCross/data
     restart: unless-stopped
@@ -209,5 +226,3 @@ tedicross/
 ---
 
 **참고**: 이 이미지는 TediCross의 네트워크 타임아웃 문제를 해결하기 위해 특별히 최적화되었습니다. 프로덕션 환경에서 사용하기 전에 충분한 테스트를 권장합니다.
-
-

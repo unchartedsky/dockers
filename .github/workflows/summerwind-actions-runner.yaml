@@ -22,11 +22,11 @@ jobs:
       - name: Env
         run: |
           env | sort
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
       -
         name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Handle keyserver connections
         run: |
           wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
@@ -35,15 +35,21 @@ jobs:
           cat ${PROJECT}/Dockerfile.template | docker run -i --rm subfuzion/envtpl > ${PROJECT}/Dockerfile ;
         env:
           PROJECT: ${{ github.workflow }}
-      - name: Publish to Registry
-        uses: docker/build-push-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          repository: ${{ github.repository_owner }}/${{ github.workflow }}
-          dockerfile: ${{ github.workflow }}/Dockerfile
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          tags: "latest"
-          tag_with_ref: true
-          tag_with_sha: true
-          add_git_labels: true
+
+      - name: Publish to Registry
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ${{ github.workflow }}/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}:latest
+          provenance: false
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
