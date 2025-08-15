@@ -1,0 +1,138 @@
+name: Build TediCross Container
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'tedicross/**'
+      - '.github/workflows/tedicross.yml'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'tedicross/**'
+      - '.github/workflows/tedicross.yml'
+  schedule:
+    # 매주 일요일 오전 2시 (UTC)에 실행하여 최신 TediCross 소스로 빌드
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    # 수동 실행 가능
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/tedicross
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Clone TediCross source code
+      run: |
+        cd tedicross
+        rm -rf tmp
+        git clone --depth 1 --branch stable https://github.com/TediCross/TediCross tmp
+
+    - name: Get TediCross version info
+      id: tedicross-info
+      run: |
+        cd tedicross/tmp
+        COMMIT_HASH=$(git rev-parse --short HEAD)
+        COMMIT_DATE=$(git log -1 --format=%cd --date=format:%Y%m%d)
+        VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")
+
+        echo "commit_hash=${COMMIT_HASH}" >> $GITHUB_OUTPUT
+        echo "commit_date=${COMMIT_DATE}" >> $GITHUB_OUTPUT
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+    - name: Generate Dockerfile from template
+      run: |
+        cd tedicross
+        cp Dockerfile.template Dockerfile
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=schedule,pattern=weekly-{{date 'YYYYMMDD'}}
+          type=raw,value=v${{ steps.tedicross-info.outputs.version }}-node22
+          type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=${{ steps.tedicross-info.outputs.commit_hash }}
+        labels: |
+          org.opencontainers.image.title=TediCross Custom
+          org.opencontainers.image.description=TediCross Telegram-Discord bridge with Node.js 22
+          org.opencontainers.image.vendor=${{ github.repository_owner }}
+          org.opencontainers.image.version=${{ steps.tedicross-info.outputs.version }}
+          org.opencontainers.image.revision=${{ steps.tedicross-info.outputs.commit_hash }}
+          org.opencontainers.image.created=${{ steps.tedicross-info.outputs.build_date }}
+          tedicross.version=${{ steps.tedicross-info.outputs.version }}
+          tedicross.commit=${{ steps.tedicross-info.outputs.commit_hash }}
+          tedicross.source=https://github.com/TediCross/TediCross
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./tedicross
+        file: ./tedicross/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        platforms: linux/amd64,linux/arm64
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
+
+    - name: Generate build summary
+      run: |
+        echo "## 🚀 TediCross Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📦 Image Information" >> $GITHUB_STEP_SUMMARY
+        echo "- **Registry**: \`${{ env.REGISTRY }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Image**: \`${{ env.IMAGE_NAME }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **TediCross Version**: \`${{ steps.tedicross-info.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Source Commit**: \`${{ steps.tedicross-info.outputs.commit_hash }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Date**: \`${{ steps.tedicross-info.outputs.build_date }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🏷️ Generated Tags" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔧 Usage" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+        echo "# Pull and run the latest image" >> $GITHUB_STEP_SUMMARY
+        echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+        echo "docker run -d --name tedicross \\" >> $GITHUB_STEP_SUMMARY
+        echo "  -v \$(pwd)/data:/opt/TediCross/data \\" >> $GITHUB_STEP_SUMMARY
+        echo "  ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+    - name: Clean up temporary files
+      if: always()
+      run: |
+        cd tedicross
+        rm -rf tmp
+        rm -f Dockerfile
+
+

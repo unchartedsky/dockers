@@ -1,6 +1,6 @@
-FROM docker.io/bitnami/wordpress:{{.BASE_IMAGE_VERSION | default "latest"}}
+FROM bitnami/wordpress:{{.BASE_IMAGE_VERSION | default "latest"}}
 
-LABEL org.opencontainers.image.source = "https://github.com/unchartedsky/dockers"
+LABEL org.opencontainers.image.source="https://github.com/unchartedsky/dockers"
 
 USER root
 
@@ -14,7 +14,7 @@ RUN set -ex; \
 # Install PHP extension: ImageMagick, Redis
 # See https://github.com/bitnami/bitnami-docker-php-fpm/issues/121
 RUN apt-get update && \
-    install_packages \
+    apt-get install -y \
       fontconfig-config fonts-dejavu-core imagemagick-6-common \
       libfftw3-double3 libfontconfig1 libglib2.0-0 libgomp1 libjbig0 \
       liblcms2-2 liblqr-1-0 libltdl7 libmagickcore-6.q16-6 \
@@ -33,7 +33,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install NewRelic
-ENV NR_INSTALL_SILENT true
+ENV NR_INSTALL_SILENT=true
 
 WORKDIR /tmp
 
