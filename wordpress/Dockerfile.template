@@ -32,17 +32,6 @@ RUN apt-get update && \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/*
 
-# Install WordPress Feature API
-RUN apt-get update && \
-    apt-get install -y git && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    mkdir -p /opt/bitnami/wordpress/wp-content/plugins/wp-feature-api && \
-    cd /opt/bitnami/wordpress/wp-content/plugins/wp-feature-api && \
-    composer require automattic/wp-feature-api:"^0.1.8" && \
-    chown -R 1001:root /opt/bitnami/wordpress/wp-content/plugins/wp-feature-api && \
-    chmod -R 775 /opt/bitnami/wordpress/wp-content/plugins/wp-feature-api && \
-    rm -rf /var/lib/apt/lists/*
-
 # Install NewRelic
 ENV NR_INSTALL_SILENT=true
 
