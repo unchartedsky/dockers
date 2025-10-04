@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-set pipefail
+set -o pipefail
 set -x
 
 THIS_DIR=$(cd "$(dirname "$0")"; pwd)
@@ -12,14 +12,25 @@ fi
 
 mkdir -p "${THIS_DIR}/tmp"
 
-# Docker template
-BASE_IMAGE_VERSION=$(curl --silent https://registry.hub.docker.com/v1/repositories/bitnami/wordpress/tags | jq -r '.[].name' | sort --version-sort | grep -v latest | grep -v '_' | tail -n1)
+# Docker template - WordPress official image
+# Fetch latest stable PHP 8.2 Apache version (excluding beta, rc, alpha)
+WORDPRESS_VERSION=$(curl --silent "https://registry.hub.docker.com/v2/repositories/library/wordpress/tags?page_size=100" | \
+    jq -r '.results[].name' | \
+    grep -E '^[0-9]+\.[0-9]+.*-php8\.2-apache$' | \
+    grep -v 'beta\|rc\|alpha' | \
+    sort --version-sort | \
+    tail -n1)
+
 EXIT_CODE=$?
-if [[ "${EXIT_CODE}" -ne "0" ]]; then
-    echo "WARN the version ${BASE_IMAGE_VERSION} is not yet deployed and latest version will be used!"
-    BASE_IMAGE_VERSION=latest
+if [[ "${EXIT_CODE}" -ne "0" ]] || [[ -z "${WORDPRESS_VERSION}" ]]; then
+    echo "WARN: Could not fetch latest version, falling back to php8.2-apache"
+    WORDPRESS_VERSION="php8.2-apache"
 fi
 
-cat "${THIS_DIR}/Dockerfile.template" | docker run --env BASE_IMAGE_VERSION="${BASE_IMAGE_VERSION}" -i --rm subfuzion/envtpl > "${THIS_DIR}/Dockerfile" ;
+echo "Using WordPress official image version: ${WORDPRESS_VERSION}"
 
-echo "${BASE_IMAGE_VERSION}" > "${THIS_DIR}/tmp/base_image_version.txt"
+cat "${THIS_DIR}/Dockerfile.template" | docker run --env WORDPRESS_VERSION="${WORDPRESS_VERSION}" -i --rm subfuzion/envtpl > "${THIS_DIR}/Dockerfile"
+
+echo "${WORDPRESS_VERSION}" > "${THIS_DIR}/tmp/base_image_version.txt"
+
+echo "Dockerfile generated successfully with WordPress version: ${WORDPRESS_VERSION}"

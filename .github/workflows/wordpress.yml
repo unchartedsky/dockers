@@ -27,8 +27,12 @@ jobs:
       && !contains(github.event.commits[0].message, '[wip]')
       && !startswith(github.event.commits[0].message, 'wip ')
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64/v8]
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}
+      PLATFORM: ${{ matrix.platform }}
     steps:
       - name: Env
         run: |
@@ -109,9 +113,9 @@ jobs:
         with:
           file: ${{ github.workspace }}/${{ github.workflow }}/Dockerfile
           context: ${{ github.workspace }}/${{ github.workflow }}
-          platforms: linux/amd64
+          platforms: ${{ matrix.platform }}
           tags: ${{ steps.prep.outputs.tags }}
           pull: true
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.platform }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.platform }}
