@@ -90,7 +90,7 @@ jobs:
           tedicross.source=https://github.com/TediCross/TediCross
 
     - name: Build and push Docker image
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: ./tedicross
         file: ./tedicross/Dockerfile
