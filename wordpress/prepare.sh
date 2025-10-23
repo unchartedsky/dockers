@@ -16,7 +16,7 @@ mkdir -p "${THIS_DIR}/tmp"
 # Fetch latest stable PHP 8.2 Apache version (excluding beta, rc, alpha)
 WORDPRESS_VERSION=$(curl --silent "https://registry.hub.docker.com/v2/repositories/library/wordpress/tags?page_size=100" | \
     jq -r '.results[].name' | \
-    grep -E '^[0-9]+\.[0-9]+.*-php8\.2-apache$' | \
+    grep -E '^[0-9]+\.[0-9]+.*-php.+-apache$' | \
     grep -v 'beta\|rc\|alpha' | \
     sort --version-sort | \
     tail -n1)
