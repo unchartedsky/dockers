@@ -16,10 +16,10 @@ mkdir -p "${THIS_DIR}/tmp"
 # Fetch latest stable PHP 8.2 Apache version (excluding beta, rc, alpha)
 WORDPRESS_VERSION=$(curl --silent "https://registry.hub.docker.com/v2/repositories/library/wordpress/tags?page_size=100" | \
     jq -r '.results[].name' | \
-    grep -E '^[0-9]+\.[0-9]+.*-php.+-apache$' | \
     grep -v 'beta\|rc\|alpha' | \
+    grep -E '^[0-9]+\.[0-9]+.*-php8\.2-apache$' | \
     sort --version-sort | \
-    tail -n1)
+    tail -n1 || true)
 
 EXIT_CODE=$?
 if [[ "${EXIT_CODE}" -ne "0" ]] || [[ -z "${WORDPRESS_VERSION}" ]]; then
