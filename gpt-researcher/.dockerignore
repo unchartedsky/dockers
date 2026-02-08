@@ -1,0 +1,23 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+!README.md
+
+# Build scripts
+build.sh
+
+# Docker files
+Dockerfile
+Dockerfile.template
+.dockerignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~

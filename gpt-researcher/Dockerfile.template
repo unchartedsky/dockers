@@ -1,0 +1,22 @@
+# Base: Official GPT-Researcher from GitHub Container Registry
+FROM ghcr.io/assafelovic/gpt-researcher:latest
+
+# Metadata labels
+LABEL org.opencontainers.image.source=https://github.com/unchartedsky/dockers \
+      org.opencontainers.image.title="GPT-Researcher Custom" \
+      org.opencontainers.image.description="GPT-Researcher with additional Python packages" \
+      gpt-researcher.custom="true"
+
+# Install additional Python packages
+COPY requirements-custom.txt /tmp/requirements-custom.txt
+
+RUN pip install --no-cache-dir -r /tmp/requirements-custom.txt && \
+    rm /tmp/requirements-custom.txt
+
+# Verify critical packages
+RUN python -c "import duckduckgo_search; print('✓ duckduckgo-search installed')" && \
+    python -c "import firecrawl; print('✓ firecrawl installed')" || true
+
+# Use original workdir and entrypoint
+WORKDIR /usr/src/app
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
