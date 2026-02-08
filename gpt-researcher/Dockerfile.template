@@ -8,10 +8,10 @@ LABEL org.opencontainers.image.source=https://github.com/unchartedsky/dockers \
       gpt-researcher.custom="true"
 
 # Install additional Python packages
-COPY requirements-custom.txt /tmp/requirements-custom.txt
+COPY requirements-custom.txt /usr/src/app/requirements-custom.txt
 
-RUN pip install --no-cache-dir -r /tmp/requirements-custom.txt && \
-    rm /tmp/requirements-custom.txt
+RUN pip install --no-cache-dir -r /usr/src/app/requirements-custom.txt && \
+    rm /usr/src/app/requirements-custom.txt
 
 # Verify critical packages
 RUN python -c "import duckduckgo_search; print('✓ duckduckgo-search installed')" && \
