@@ -27,9 +27,6 @@ jobs:
         name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v3
-      - name: Handle keyserver connections
-        run: |
-          wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
       - name: Generate Dockerfile
         run: |
           cat ${PROJECT}/Dockerfile.template | docker run -i --rm subfuzion/envtpl > ${PROJECT}/Dockerfile ;
