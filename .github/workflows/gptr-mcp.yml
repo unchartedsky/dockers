@@ -30,8 +30,8 @@ jobs:
     - name: Download upstream source
       run: |
         set -euo pipefail
-        curl -fsSL https://github.com/assafelovic/gptr-mcp/archive/refs/heads/main.tar.gz | tar xz
-        test -d gptr-mcp-main
+        curl -fsSL https://github.com/assafelovic/gptr-mcp/archive/refs/heads/master.tar.gz | tar xz
+        test -d gptr-mcp-master
 
     - name: Log in to Container Registry
       uses: docker/login-action@v3
@@ -58,7 +58,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
-        context: ./gptr-mcp-main
+        context: ./gptr-mcp-master
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
