@@ -28,9 +28,6 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Handle keyserver connections
-      run: |
-        wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
     - name: Build
       run: |
         docker build -f ${PROJECT}/Dockerfile -t ${CONTAINER_IMAGE} .

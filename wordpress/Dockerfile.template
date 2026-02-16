@@ -1,4 +1,4 @@
-FROM wordpress:{{.WORDPRESS_VERSION | default "php8.2-apache"}}
+FROM wordpress:{{.WORDPRESS_VERSION | default "php8.5-apache"}}
 
 LABEL org.opencontainers.image.source="https://github.com/unchartedsky/dockers"
 
@@ -21,17 +21,22 @@ RUN curl -fsSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-
 RUN apt-get update && \
     apt-get install -y \
       imagemagick \
+      libgmp-dev \
       libmagickwand-dev \
       gcc make autoconf libc-dev pkg-config && \
-    pecl install redis imagick && \
-    docker-php-ext-enable redis imagick && \
+    pecl channel-update pecl.php.net && \
+    pecl install -o -f redis && \
+    docker-php-ext-enable redis && \
+    docker-php-ext-configure gmp && \
+    docker-php-ext-install -j"$(nproc)" gmp && \
+    docker-php-ext-enable gmp && \
     # ImageMagick environment configuration for Apache (not PHP-FPM)
     MAGICK_PATH=$(find /usr/lib/*/ImageMagick-* -type d -name coders 2>/dev/null | head -1 | xargs dirname) && \
     if [ -n "$MAGICK_PATH" ]; then \
       echo "export MAGICK_CODER_MODULE_PATH=\"$MAGICK_PATH/coders\"" >> /etc/apache2/envvars; \
     fi && \
     apt-get -y remove --auto-remove \
-      gcc make autoconf libc-dev pkg-config libmagickwand-dev && \
+      gcc make autoconf libc-dev pkg-config libmagickwand-dev libgmp-dev && \
     rm -rf /usr/include/* && \
     rm -rf /tmp/* && \
     rm -rf /var/lib/apt/lists/*
