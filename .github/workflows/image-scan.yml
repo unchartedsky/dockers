@@ -19,6 +19,12 @@ jobs:
       matrix:
         image: [wordpress, fulltextrss-base, macgyver, gpt-researcher, gptr-mcp, dante-telegram]
     steps:
+      - name: GHCR 로그인 (trivy 원격 조회용)
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
       - name: 최신 digest 조회
         id: ref
         env:
