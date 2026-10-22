@@ -1,0 +1,35 @@
+# 주간 이미지 CVE 스캔 — 배포 중인 셀프빌드 이미지만.
+# 태그가 sha·날짜로 제각각이라 최신 digest를 GHCR API로 조회해 스캔한다.
+name: image-scan
+
+on:
+  schedule:
+    - cron: "30 0 * * 1" # 매주 월요일 09:30 KST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image: [wordpress, fulltextrss-base, macgyver, gpt-researcher, gptr-mcp, dante-telegram]
+    steps:
+      - name: 최신 digest 조회
+        id: ref
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          digest=$(gh api "orgs/unchartedsky/packages/container/${{ matrix.image }}/versions?per_page=1" --jq '.[0].name')
+          echo "ref=ghcr.io/unchartedsky/${{ matrix.image }}@${digest}" >> "$GITHUB_OUTPUT"
+      - name: Trivy 스캔 (HIGH/CRITICAL 발견 시 job 실패 → GitHub 알림 메일)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ steps.ref.outputs.ref }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
