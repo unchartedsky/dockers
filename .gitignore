@@ -51,3 +51,6 @@ tmp/
 .claude/settings.local.json
 .worktrees/
 .context/compound-engineering/
+.compound-engineering/*.local.yaml
+.claude/skill-team-rules/
+.serena/
