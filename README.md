@@ -43,11 +43,11 @@ cd tedicross && ./build.sh
 
 | 서비스 | 디렉토리 | 빌드 방식 | 워크플로우 |
 | --- | --- | --- | --- |
-| dante-telegram | `dante-telegram/` | 업스트림 소스 다운로드 후 빌드 | `.github/workflows/dante-telegram.yaml` |
+| dante-telegram | `dante-telegram/` (README만 있음) | 워크플로우가 업스트림 소스를 내려받아 빌드 | `.github/workflows/dante-telegram.yaml` |
 | fulltextrss-base | `fulltextrss-base/` | 직접 `Dockerfile` 빌드 | `.github/workflows/fulltextrss-base.yaml` |
 | gpt-researcher | `gpt-researcher/` | `Dockerfile.template` 기반 커스텀 빌드 | `.github/workflows/gpt-researcher.yml` |
 | gptr-mcp | (로컬 서비스 디렉토리 없음) | CI에서 업스트림 tarball 다운로드 후 빌드 | `.github/workflows/gptr-mcp.yml` |
-| ikev2-vpn-server | `ikev2-vpn-server/` | 업스트림 소스 다운로드 후 빌드 | `.github/workflows/ikev2-vpn-server.yaml` |
+| ikev2-vpn-server | `ikev2-vpn-server/` (README만 있음) | 워크플로우가 업스트림 소스를 내려받아 빌드 | `.github/workflows/ikev2-vpn-server.yaml` |
 | mysql | `mysql/` | 직접 `Dockerfile` 빌드 | (전용 workflow 없음) |
 | summerwind-actions-runner | `summerwind-actions-runner/` | `Dockerfile.template` 렌더링 후 빌드 | `.github/workflows/summerwind-actions-runner.yaml` |
 | tedicross | `tedicross/` | 업스트림 clone + `Dockerfile.template` 기반 빌드 | `.github/workflows/tedicross.yml` |
