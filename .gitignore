@@ -50,3 +50,4 @@ summerwind-actions-runner/Dockerfile
 tmp/
 .claude/settings.local.json
 .worktrees/
+.context/compound-engineering/
