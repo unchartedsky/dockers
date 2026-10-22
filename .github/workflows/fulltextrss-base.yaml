@@ -36,7 +36,7 @@ jobs:
         PROJECT: ${{ github.workflow }}
         CONTAINER_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}:${{ github.sha }}
     - name: Deploy
-      if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
       run: |
         docker push ${CONTAINER_IMAGE}
       env:

@@ -55,7 +55,7 @@ jobs:
           VERSION=$(echo "${VERSION}" | sed -r 's/\//_/g')
           TAGS="${DOCKER_IMAGE}:${VERSION}"
 
-          if [[ "${VERSION}" == "master" ]]; then
+          if [[ "${VERSION}" == "master" || "${VERSION}" == "main" ]]; then
             TAGS="$TAGS,${DOCKER_IMAGE}:latest"
           fi
 
