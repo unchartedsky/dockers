@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -e
-set -o pipefail
+set -euo pipefail
 set -x
 
 THIS_DIR=$(cd "$(dirname "$0")"; pwd)
@@ -13,29 +12,26 @@ fi
 mkdir -p "${THIS_DIR}/tmp"
 
 # Docker template - WordPress official image
-# Fetch latest stable WordPress tag with PHP Apache variant (excluding beta, rc, alpha)
-WORDPRESS_VERSION=$(curl --silent "https://registry.hub.docker.com/v2/repositories/library/wordpress/tags?page_size=100" | \
-    jq -r '.results[].name' | \
-    grep -v 'beta\|rc\|alpha' | \
-    grep -E '^[0-9]+\.[0-9]+.*-php[0-9]+\.[0-9]+-apache$' | \
-    sort --version-sort | \
-    tail -n1 || true)
+# Docker Hub 단일 페이지는 beta 태그로 가득 차 stable 태그를 놓칠 수 있어 여러 페이지를 조회한다
+fetch_wordpress_tags() {
+    for page in 1 2 3; do
+        curl --silent --fail "https://registry.hub.docker.com/v2/repositories/library/wordpress/tags?page_size=100&page=${page}" | \
+            jq -r '.results[].name'
+    done
+}
 
-EXIT_CODE=$?
-if [[ "${EXIT_CODE}" -ne "0" ]] || [[ -z "${WORDPRESS_VERSION}" ]]; then
-    echo "WARN: Could not fetch latest numeric version tag, trying alias fallback"
-    FALLBACK_ALIAS=$(curl --silent "https://registry.hub.docker.com/v2/repositories/library/wordpress/tags?page_size=100" | \
-        jq -r '.results[].name' | \
-        grep -v 'beta\|rc\|alpha' | \
-        grep -E '^php[0-9]+\.[0-9]+-apache$' | \
-        sort --version-sort | \
-        tail -n1 || true)
-    if [[ -n "${FALLBACK_ALIAS}" ]]; then
-        WORDPRESS_VERSION="${FALLBACK_ALIAS}"
-    else
-        echo "WARN: Could not determine alias fallback, using php8.2-apache"
-        WORDPRESS_VERSION="php8.2-apache"
-    fi
+# PHP 8.5 variant만 사용 (beta, rc, alpha 제외)
+TAGS=$(fetch_wordpress_tags | grep -v 'beta\|rc\|alpha' || true)
+
+# 1순위: 버전이 붙은 full 태그 (최신 버전), 2순위: alias 태그
+WORDPRESS_VERSION=$(echo "${TAGS}" | grep -E '^[0-9]+\.[0-9]+.*-php8\.5-apache$' | sort --version-sort | tail -n1 || true)
+if [[ -z "${WORDPRESS_VERSION}" ]]; then
+    WORDPRESS_VERSION=$(echo "${TAGS}" | grep -E '^php8\.5-apache$' || true)
+fi
+
+if [[ -z "${WORDPRESS_VERSION}" ]]; then
+    echo "ERROR: php8.5-apache 계열 WordPress 태그를 찾지 못했습니다" >&2
+    exit 1
 fi
 
 echo "Using WordPress official image version: ${WORDPRESS_VERSION}"

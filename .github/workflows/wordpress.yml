@@ -11,6 +11,7 @@ on:
     # KST 기준: 2시
     # https://crontab.guru/#0_17_*_*_*
     - cron: "0 17 * * *"
+  workflow_dispatch:
 
 defaults:
   run:
