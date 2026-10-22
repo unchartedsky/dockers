@@ -82,7 +82,7 @@ jobs:
           gpt-researcher.base.image=ghcr.io/assafelovic/gpt-researcher:latest
 
     - name: Build and push Docker image
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@v7
       with:
         context: ./gpt-researcher
         file: ./gpt-researcher/Dockerfile
