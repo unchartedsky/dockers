@@ -1,5 +1,7 @@
-# 주간 이미지 CVE 스캔 — 배포 중인 셀프빌드 이미지만.
+# 주간 이미지 CVE 모니터링 — 배포 중인 셀프빌드 이미지만.
 # 태그가 sha·날짜로 제각각이라 최신 digest를 GHCR API로 조회해 스캔한다.
+# 발견은 job 실패가 아니라 Security 탭 코드 스캐닝 알림으로 적재한다 —
+# 우리가 못 고치는 것은 알림을 Dismiss(사유 기록)하고, 수정되면 자동 해소된다.
 name: image-scan
 
 on:
@@ -10,6 +12,7 @@ on:
 permissions:
   contents: read
   packages: read
+  security-events: write
 
 jobs:
   scan:
@@ -32,10 +35,16 @@ jobs:
         run: |
           digest=$(gh api "orgs/unchartedsky/packages/container/${{ matrix.image }}/versions?per_page=1" --jq '.[0].name')
           echo "ref=ghcr.io/unchartedsky/${{ matrix.image }}@${digest}" >> "$GITHUB_OUTPUT"
-      - name: Trivy 스캔 (HIGH/CRITICAL 발견 시 job 실패 → GitHub 알림 메일)
+      - name: Trivy 스캔 (SARIF 리포트 생성)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.ref.outputs.ref }}
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          exit-code: "1"
+          format: sarif
+          output: trivy-results.sarif
+      - name: Security 탭 업로드 (이미지별 category 분리)
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: ${{ matrix.image }}
