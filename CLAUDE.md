@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 서비스별 빌드 방식은 세 가지입니다.
 - **직접 Dockerfile 빌드**: 저장소의 `Dockerfile`을 그대로 사용 (`fulltextrss-base`)
 - **템플릿 렌더링 후 빌드**: `Dockerfile.template`을 `subfuzion/envtpl`로 렌더링해 `Dockerfile` 생성 (`wordpress`, `gpt-researcher`, `tedicross`, `summerwind-actions-runner`)
-- **업스트림 소스 기반**: 저장소에 Dockerfile이 없고 CI가 업스트림을 받아 빌드 (`dante-telegram`, `ikev2-vpn-server`, `gptr-mcp`)
+- **업스트림 소스 기반**: 저장소에 Dockerfile이 없고 CI가 업스트림을 받아 빌드 (`gptr-mcp`)
 
 ## 주요 명령어
 
