@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        image: [wordpress, fulltextrss-base, macgyver, gpt-researcher, gptr-mcp, dante-telegram]
+        image: [wordpress, fulltextrss-base, macgyver, gpt-researcher, gptr-mcp]
     steps:
       - name: GHCR 로그인 (trivy 원격 조회용)
         uses: docker/login-action@v4
