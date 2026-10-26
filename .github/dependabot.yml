@@ -11,7 +11,14 @@ updates:
     schedule:
       interval: "weekly"
 
+  # Dockerfiles live in per-image subdirectories, and the docker fetcher does not
+  # recurse — point each one explicitly (Dockerfile.template also matches).
   - package-ecosystem: "docker"
-    directory: "/"
+    directories:
+      - "/fulltextrss-base"
+      - "/gpt-researcher"
+      - "/summerwind-actions-runner"
+      - "/tedicross"
+      - "/wordpress"
     schedule:
       interval: "weekly"
