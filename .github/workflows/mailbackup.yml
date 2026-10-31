@@ -1,0 +1,43 @@
+name: mailbackup
+
+on:
+  push:
+    paths:
+      - ".github/workflows/mailbackup.yml"
+      - "mailbackup/**"
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # At 00:00 on Sunday.
+    # https://crontab.guru/#0_0_*_*_7
+    - cron:  '30 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Env
+      run: |
+        env | sort
+    - uses: actions/checkout@v7
+    -
+      name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v4
+    - uses: docker/login-action@v4
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build
+      run: |
+        docker build -f ${PROJECT}/Dockerfile -t ${CONTAINER_IMAGE} .
+      env:
+        PROJECT: ${{ github.workflow }}
+        CONTAINER_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}:${{ github.sha }}
+    - name: Deploy
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+      run: |
+        docker push ${CONTAINER_IMAGE}
+      env:
+        CONTAINER_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.workflow }}:${{ github.sha }}
