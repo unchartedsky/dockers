@@ -1,7 +1,8 @@
 FROM node:26-bookworm-slim
 
 # 필수 패키지 설치 및 업데이트 (SOCKS5 프록시 지원 포함)
-RUN apt-get update && apt-get install -y \
+# apt-get upgrade: base 이미지(node:26-bookworm-slim)에 쌓인 fixable CVE 흡수
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     python3 \
     g++ \
     make \
