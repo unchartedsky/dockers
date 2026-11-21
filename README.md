@@ -1,6 +1,7 @@
 ![](https://github.com/unchartedsky/dockers/actions/workflows/fulltextrss-base.yaml/badge.svg)
 ![](https://github.com/unchartedsky/dockers/actions/workflows/gpt-researcher.yml/badge.svg)
 ![](https://github.com/unchartedsky/dockers/actions/workflows/gptr-mcp.yml/badge.svg)
+![](https://github.com/unchartedsky/dockers/actions/workflows/hyperresearch.yml/badge.svg)
 ![](https://github.com/unchartedsky/dockers/actions/workflows/summerwind-actions-runner.yaml/badge.svg)
 ![](https://github.com/unchartedsky/dockers/actions/workflows/tedicross.yml/badge.svg)
 ![](https://github.com/unchartedsky/dockers/actions/workflows/wordpress.yml/badge.svg)
@@ -44,10 +45,19 @@ cd tedicross && ./build.sh
 | fulltextrss-base | `fulltextrss-base/` | 직접 `Dockerfile` 빌드 | `.github/workflows/fulltextrss-base.yaml` |
 | gpt-researcher | `gpt-researcher/` | `Dockerfile.template` 기반 커스텀 빌드 | `.github/workflows/gpt-researcher.yml` |
 | gptr-mcp | (로컬 서비스 디렉토리 없음) | CI에서 업스트림 tarball 다운로드 후 빌드 | `.github/workflows/gptr-mcp.yml` |
+| hyperresearch | `hyperresearch/` | Hyperresearch 운영용 extras와 mcp-proxy를 포함한 MCP 이미지 | `.github/workflows/hyperresearch.yml` |
 | mysql | `mysql/` | 직접 `Dockerfile` 빌드 | (전용 workflow 없음) |
 | summerwind-actions-runner | `summerwind-actions-runner/` | `Dockerfile.template` 렌더링 후 빌드 | `.github/workflows/summerwind-actions-runner.yaml` |
 | tedicross | `tedicross/` | 업스트림 clone + `Dockerfile.template` 기반 빌드 | `.github/workflows/tedicross.yml` |
 | wordpress | `wordpress/` | `prepare.sh`로 동적 버전 계산 후 템플릿 빌드 | `.github/workflows/wordpress.yml` |
+
+### Hyperresearch MCP
+
+`hyperresearch[all]`로 MCP, Exa, Tavily, Parallel, Crawl4AI, Watchdog용 Python 패키지를 설치합니다. 개발용 패키지, 서비스 API 키, 브라우저 바이너리는 이미지에 넣지 않습니다. 기본 URL 수집은 별도 키 없이 동작하는 builtin을 사용합니다. 키나 브라우저가 필요한 제공자는 별도의 실행 설정이 필요합니다.
+
+서비스는 `/vault`에 쓰기 가능한 볼륨을 마운트하고, `HYPERRESEARCH_MCP_HOST`에 프록시가 받는 Host authority, `MCP_PROXY_AUTH_TOKEN`에 비밀 토큰을 설정해야 합니다. 포트는 `8080`, Streamable HTTP 경로는 `/mcp`입니다. 평문 HTTP는 신뢰된 내부 구간에서만 사용하고, 외부 접속에는 별도 TLS와 접근 제한을 적용합니다.
+
+푸시 시에는 빌드와 오프라인 시험만 실행합니다. GHCR에 발행하려면 기본 브랜치에서 Hyperresearch 워크플로를 수동 실행하고, 크롤링이 승인된 공개 HTTPS 시험 URL을 `verify_url`에 지정합니다. 비밀이나 실제 연구 데이터가 들어 있는 URL은 사용하지 않습니다. 두 시험을 모두 통과한 동일 이미지만 발행합니다.
 
 ## CI/CD 개요
 
