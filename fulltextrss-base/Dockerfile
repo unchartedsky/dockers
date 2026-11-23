@@ -1,4 +1,4 @@
-FROM php:8.5-apache-trixie
+FROM php:8.6-apache-trixie
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
